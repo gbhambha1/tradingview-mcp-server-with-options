@@ -1,0 +1,64 @@
+{
+  "strategy": "EMA-21 Long-Only Strategy",
+  "version": "3.0",
+  "description": "Long-only swing strategy for strongly trending stocks like NVDA. Buy when price reclaims the EMA 21 with volume and momentum. Exit when price closes back below EMA 21, or via ATR-based stop/target. No short trades.",
+  "timeframe": "Daily (D)",
+  "universe": "Large-cap equities with strong upward bias (e.g. NVDA, AAPL, MSFT)",
+
+  "rules": {
+    "entry_long": {
+      "conditions": [
+        "Close crosses ABOVE EMA 21 — price reclaims the key trend line",
+        "Volume > 1.2x the 20-day average — move is backed by participation",
+        "RSI(14) > 50 — momentum is bullish"
+      ],
+      "logic": "ALL three on the same daily bar → BUY signal (green triangle)",
+      "chart_marker": "Green triangle below bar labelled BUY"
+    },
+    "exit_long": {
+      "trigger_1": "Close crosses BELOW EMA 21 — trend has flipped, exit immediately",
+      "trigger_2": "Stop loss: Entry close − (2.0 × ATR14) — protects against sharp drops",
+      "trigger_3": "Take profit: Entry close + (3.0 × ATR14) — locks in gains",
+      "logic": "Whichever triggers first wins",
+      "risk_reward_ratio": "1.5 : 1",
+      "chart_marker": "Orange triangle above bar labelled EXIT"
+    },
+    "shorts": "DISABLED — NVDA trends upward long-term; shorting against that destroys returns",
+    "position_sizing": "10% of equity per trade",
+    "max_concurrent_positions": 1,
+    "commission_modeled": "0.1% per side"
+  },
+
+  "indicators": {
+    "EMA_21": {
+      "role": "Primary trend line. When price crosses above it with volume, that's your buy. When it crosses below, that's your sell. Shown as aqua line on chart.",
+      "reference": "Murphy, J.J. — Technical Analysis of the Financial Markets (1999)"
+    },
+    "RSI_14": {
+      "role": "Single momentum check — above 50 = bullish bias, below 50 = bearish. Prevents buying into a falling market or selling into a rising one.",
+      "reference": "Wilder, J.W. — New Concepts in Technical Trading Systems (1978)"
+    },
+    "Volume_MA_20": {
+      "role": "20-day average volume baseline. Threshold: 1.2x. Filters out low-energy, unreliable crossovers.",
+      "reference": "O'Neil, W.J. — How to Make Money in Stocks (1988), CANSLIM"
+    },
+    "ATR_14": {
+      "role": "Sets stop and target distances dynamically based on current volatility. Stop = 2x ATR, Target = 3x ATR.",
+      "reference": "Wilder, J.W. — New Concepts in Technical Trading Systems (1978)"
+    }
+  },
+
+  "strategy_rationale": {
+    "why_ema_21_price_cross": "The EMA 21 is one of the most widely-watched trend lines by retail and institutional traders alike. When price crosses it, it signals a real shift in short-term momentum — not just noise. It fires much more frequently than a 21/50 EMA crossover, giving more visible trade opportunities.",
+    "why_volume_1_2x": "A 1.2x volume threshold catches meaningful participation without being so strict that it misses valid moves. On a volatile stock like NVDA, 1.5x was too selective.",
+    "why_rsi_above_50": "RSI > 50 is the simplest momentum check: the stock is in net bullish territory. It prevents buying into a death cross bounce or selling into an oversold recovery. No band needed — just the midline.",
+    "why_atr_stops": "NVDA can move $10-20/day. Fixed dollar stops are meaningless. ATR-based stops adapt to the stock's actual volatility at the time of entry."
+  },
+
+  "references": [
+    "Wilder, J.W. (1978). New Concepts in Technical Trading Systems — RSI, ATR",
+    "Murphy, J.J. (1999). Technical Analysis of the Financial Markets — EMA trend lines",
+    "O'Neil, W.J. (1988). How to Make Money in Stocks — CANSLIM, volume confirmation",
+    "Elder, A. (1993). Trading for a Living — EMA as dynamic support/resistance"
+  ]
+}
